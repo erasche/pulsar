@@ -84,6 +84,9 @@ paste.app_factory = pulsar.web.wsgi:app_factory
 ## external clean up.
 #file_cache_dir = cache
 
+## Sentry Logging URL
+# sentry_dsn = https://user:password@getsentry.org/
+
 
 ## Configure uWSGI (if used).
 [uwsgi]
