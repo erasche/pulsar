@@ -31,6 +31,7 @@ class PulsarApp(object):
     def __init__(self, **conf):
         if conf is None:
             conf = {}
+        self.__setup_sentry_logging(conf)
         self.__setup_staging_directory(conf.get("staging_directory", DEFAULT_STAGING_DIRECTORY))
         self.__setup_private_token(conf.get("private_token", DEFAULT_PRIVATE_TOKEN))
         self.__setup_persistence_directory(conf.get("persistence_directory", None))
@@ -120,3 +121,13 @@ class PulsarApp(object):
     def __setup_job_metrics(self, conf):
         job_metrics_config_file = conf.get("job_metrics_config_file", "job_metrics_conf.xml")
         self.job_metrics = JobMetrics(job_metrics_config_file)
+
+    def __setup_sentry_logging(self, conf):
+        # Bind early to ensure we capture any and all errors
+        sentry_dsn = conf.get("sentry_dsn", None)
+        if sentry_dsn is not None:
+            log.debug("Attaching SentryHandler to logging process")
+            from raven.handlers.logging import SentryHandler
+            handler = SentryHandler(sentry_dsn)
+            from raven.conf import setup_logging
+            setup_logging(handler)
