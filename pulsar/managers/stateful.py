@@ -12,6 +12,13 @@ from .staging import postprocess
 
 import logging
 log = logging.getLogger(__name__)
+sentry_dsn = app_conf.get('sentry_dsn', None)
+if sentry_dsn is not None:
+    from raven.conf import setup_logging
+    from raven.handlers.logging import SentryHandler
+    handler = SentryHandler(sentry_dsn)
+    setup_logging(handler)
+
 
 DEFAULT_DO_MONITOR = False
 

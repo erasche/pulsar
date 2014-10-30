@@ -6,6 +6,8 @@ from pulsar.core import PulsarApp
 from pulsar.web.framework import RoutingApp
 
 import pulsar.web.routes
+import logging
+log = logging.getLogger(__name__)
 
 
 def app_factory(global_conf, **local_conf):
@@ -17,6 +19,15 @@ def app_factory(global_conf, **local_conf):
     pulsar_app = PulsarApp(**app_conf)
     webapp = PulsarWebApp(pulsar_app=pulsar_app)
     atexit.register(webapp.shutdown)
+
+    # Here to catch WSGI level errors
+    sentry_dsn = app_conf.get('sentry_dsn', None)
+    if sentry_dsn is not None:
+        from raven.conf import setup_logging
+        from raven.handlers.logging import SentryHandler
+        handler = SentryHandler(sentry_dsn)
+        setup_logging(handler)
+
     return webapp
 
 
